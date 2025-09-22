@@ -41,12 +41,13 @@ if st.session_state["page"] == "home":
         st.write(f"Rows: {df.shape[0]}, Columns: {df.shape[1]}")
 
         # Info
+        import io
         st.subheader("Dataset Info")
-        buffer = []
-        df.info(buf=buffer.append)
-        info_str = "\n".join(buffer)
+        buffer = io.StringIO()       # create a string buffer
+        df.info(buf=buffer)          # write info to buffer
+        info_str = buffer.getvalue() # get string from buffer
         st.text(info_str)
-        st.subheader("Dropping Unwanted Columns")
+
 
         drop_cols = ['Transaction_ID', 'FastagID', 'Vehicle_Plate_Number']
         df = df.drop(columns=[col for col in drop_cols if col in df.columns], axis=1)
