@@ -140,13 +140,3 @@ else:
 # Display updated dataset
 st.subheader("Updated Dataset Preview")
 st.dataframe(df.head())
-
-# Store back to session_state
-st.session_state['df'] = df
-
-# Back button
-if st.button("⬅️ Back to Home"):
-  st.session_state["page"] = "home"
-  st.experimental_rerun()
-else:
-st.info("Dataset not found. Please upload your file on the Home page first.")
