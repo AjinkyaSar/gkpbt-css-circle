@@ -120,17 +120,17 @@ if st.button("Go to Next Page ➡️"):
 
 st.subheader("Outlier Treatment and Updated Boxplots")
 
-    for col in ['Amount_paid', 'Vehicle_Speed']:
-        if col in df.columns:
-            Q1 = df[col].quantile(0.25)
-            Q3 = df[col].quantile(0.75)
-            IQR = Q3 - Q1
+for col in ['Amount_paid', 'Vehicle_Speed']:
+    if col in df.columns:
+        Q1 = df[col].quantile(0.25)
+        Q3 = df[col].quantile(0.75)
+        IQR = Q3 - Q1
 
-            lower_bound = Q1 - 1.5 * IQR
-            upper_bound = Q3 + 1.5 * IQR
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
 
-            df[col] = np.where(df[col] < lower_bound, lower_bound, df[col])
-            df[col] = np.where(df[col] > upper_bound, upper_bound, df[col])
+        df[col] = np.where(df[col] < lower_bound, lower_bound, df[col])
+        df[col] = np.where(df[col] > upper_bound, upper_bound, df[col])
 
     # Updated boxplots for numerical columns
     if numerical_cols:
