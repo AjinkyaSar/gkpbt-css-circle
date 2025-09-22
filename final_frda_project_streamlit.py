@@ -71,27 +71,6 @@ if st.session_state["page"] == "home":
     else:
         st.info("Please upload a CSV or Excel file from the sidebar to get started.")
 
-# --- Next Page ---
-elif st.session_state["page"] == "next":
-    st.title("🚀 Data Pre-Processing")
-
-    if st.button("⬅️ Back to Home"):
-        st.session_state["page"] = "home"
-        st.experimental_rerun()
-
-import streamlit as st
-import pandas as pd
-import numpy as np
-
-st.title("📊 Numerical Data Exploration & Outlier Treatment")
-
-# Ensure 'df' exists
-if 'df' not in st.session_state:
-    st.warning("Dataset not found. Please upload your CSV/Excel file first.")
-    st.stop()
-else:
-    df = st.session_state['df']
-
 numerical_cols = df.select_dtypes(include='number').columns.tolist()
 if 'isFraud' in numerical_cols:
     numerical_cols.remove('isFraud')
