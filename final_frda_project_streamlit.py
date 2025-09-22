@@ -72,9 +72,12 @@ if st.session_state["page"] == "home":
         st.info("Please upload a CSV or Excel file from the sidebar to get started.")
 
 
+import streamlit as st
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
 st.title("📊 Numerical Data Exploration & Outlier Treatment")
-
-
 
 numerical_cols = df.select_dtypes(include='number').columns.tolist()
 if 'isFraud' in numerical_cols:
@@ -85,7 +88,11 @@ st.subheader("Box Plots for Numerical Columns (Original)")
 if numerical_cols:
     for col in numerical_cols:
         st.write(f"Box Plot of {col}")
-        st.pyplot(df.boxplot(column=col, grid=False, figsize=(8, 6)))
+        # Create a new figure and axes for the box plot
+        fig, ax = plt.subplots(figsize=(8, 6))
+        df.boxplot(column=col, grid=False, ax=ax)
+        st.pyplot(fig)
+        plt.close(fig) # Close the figure to prevent memory leaks
 else:
     st.info("No numerical columns available for box plots.")
 
@@ -106,15 +113,13 @@ st.subheader("Box Plots after Outlier Treatment")
 if numerical_cols:
     for col in numerical_cols:
         st.write(f"Box Plot of {col} (Updated)")
-        st.pyplot(df.boxplot(column=col, grid=False, figsize=(8, 6)))
+        # Create a new figure and axes for the box plot
+        fig, ax = plt.subplots(figsize=(8, 6))
+        df.boxplot(column=col, grid=False, ax=ax)
+        st.pyplot(fig)
+        plt.close(fig) # Close the figure to prevent memory leaks
 else:
     st.info("No numerical columns available for updated box plots.")
-
-# --- Next Page button at bottom ---
-if st.button("Go to Next Page ➡️"):
-    st.session_state["page"] = "next"
-    st.session_state['df'] = df
-    st.experimental_rerun()
 
 
 
