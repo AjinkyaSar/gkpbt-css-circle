@@ -71,7 +71,7 @@ if st.session_state["page"] == "home":
     else:
         st.info("Please upload a CSV or Excel file from the sidebar to get started.")
 
-pip install matplotlib
+!pip install matplotlib
 import matplotlib as plt
 
 st.title("📊 Numerical Data Exploration & Outlier Treatment")
