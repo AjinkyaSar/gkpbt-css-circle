@@ -82,8 +82,7 @@ elif st.session_state["page"] == "next":
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
+import plotly.express as px
 
 st.title("📊 Boxplots & Outlier Treatment")
 
@@ -95,32 +94,17 @@ if st.button("Go to Next Page ➡️"):
     st.experimental_rerun()
 
 # --- Boxplots for Numerical Columns ---
-st.subheader("Boxplots for Numerical Columns")
-numerical_cols = df.select_dtypes(include=np.number).columns.tolist()
-if "isFraud" in numerical_cols:
-    numerical_cols.remove("isFraud")
+st.subheader("Boxplots for Numerical Columns (Original)")
+numerical_cols = df.select_dtypes(include='number').columns.tolist()
+if 'isFraud' in numerical_cols:
+    numerical_cols.remove('isFraud')
 
-def plot_boxplots(df, columns, title="Boxplots"):
-    if columns:
-        n_cols = 3
-        n_rows = (len(columns) + n_cols - 1) // n_cols
-        fig, axes = plt.subplots(nrows=n_rows, ncols=n_cols, figsize=(15, 5*n_rows))
-        axes = axes.flatten()
-
-        for i, col in enumerate(columns):
-            sns.boxplot(x=df[col], ax=axes[i])
-            axes[i].set_title(col)
-
-        # Remove unused subplots
-        for j in range(i+1, len(axes)):
-            fig.delaxes(axes[j])
-
-        plt.tight_layout()
-        st.pyplot(fig)
-    else:
-        st.info("No numerical columns available for boxplots.")
-
-plot_boxplots(df, numerical_cols, "Original Boxplots")
+if numerical_cols:
+    for col in numerical_cols:
+        fig = px.box(df, y=col, title=f"Boxplot of {col}")
+        st.plotly_chart(fig)
+else:
+    st.info("No numerical columns available for boxplots.")
 
 # --- Outlier Treatment ---
 st.subheader("Outlier Treatment")
@@ -134,8 +118,15 @@ for col in ['Amount_paid', 'Vehicle_Speed']:
         df[col] = np.where(df[col] < lower_bound, lower_bound, df[col])
         df[col] = np.where(df[col] > upper_bound, upper_bound, df[col])
 
+# --- Boxplots after Outlier Treatment ---
 st.subheader("Boxplots after Outlier Treatment")
-plot_boxplots(df, numerical_cols, "Updated Boxplots")
+if numerical_cols:
+    for col in numerical_cols:
+        fig = px.box(df, y=col, title=f"Boxplot of {col} (Updated)")
+        st.plotly_chart(fig)
+else:
+    st.info("No numerical columns available for updated boxplots.")
+
 
 
 if st.button("Go to Next Page ➡️"):
