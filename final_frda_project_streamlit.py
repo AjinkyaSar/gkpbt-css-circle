@@ -88,9 +88,20 @@ if 'df' not in st.session_state:
 else:
     df = st.session_state['df']
 
+st.title("📊 Numerical Data Exploration & Outlier Treatment")
+
+
+
 numerical_cols = df.select_dtypes(include='number').columns.tolist()
 if 'isFraud' in numerical_cols:
     numerical_cols.remove('isFraud')
+
+# --- Next Page button ---
+st.subheader("Proceed to Next Stage")
+if st.button("Go to Next Page ➡️"):
+    st.session_state["page"] = "next"
+    st.session_state['df'] = df  # save dataframe for next page
+    st.experimental_rerun()
 
 # --- Box plots using Streamlit ---
 st.subheader("Box Plots for Numerical Columns (Original)")
@@ -121,6 +132,12 @@ if numerical_cols:
         st.pyplot(df.boxplot(column=col, grid=False, figsize=(8, 6)))
 else:
     st.info("No numerical columns available for updated box plots.")
+
+# --- Next Page button at bottom ---
+if st.button("Go to Next Page ➡️"):
+    st.session_state["page"] = "next"
+    st.session_state['df'] = df
+    st.experimental_rerun()
 
 
 
