@@ -75,23 +75,31 @@ numerical_cols = df.select_dtypes(include='number').columns.tolist()
 if 'isFraud' in numerical_cols:
     numerical_cols.remove('isFraud')
 
-# --- Next Page button ---
-st.subheader("Proceed to Next Stage")
-if st.button("Go to Next Page ➡️"):
-    st.session_state["page"] = "next"
-    st.session_state['df'] = df  # save dataframe for next page
-    st.experimental_rerun()
+import streamlit as st
+import pandas as pd
+import numpy as np
 
-# --- Histograms using Streamlit ---
-st.subheader("Histograms for Numerical Columns (Original)")
+st.title("📊 Numerical Data Exploration & Outlier Treatment")
+
+# Ensure 'df' exists
+if 'df' not in st.session_state:
+    st.warning("Dataset not found. Please upload your CSV/Excel file first.")
+    st.stop()
+else:
+    df = st.session_state['df']
+
+numerical_cols = df.select_dtypes(include='number').columns.tolist()
+if 'isFraud' in numerical_cols:
+    numerical_cols.remove('isFraud')
+
+# --- Box plots using Streamlit ---
+st.subheader("Box Plots for Numerical Columns (Original)")
 if numerical_cols:
     for col in numerical_cols:
-        st.write(f"Histogram of {col}")
-        counts, bins = np.histogram(df[col], bins=30)
-        hist_df = pd.DataFrame({'Bin': bins[:-1], 'Count': counts})
-        st.bar_chart(hist_df.set_index('Bin')['Count'])
+        st.write(f"Box Plot of {col}")
+        st.pyplot(df.boxplot(column=col, grid=False, figsize=(8, 6)))
 else:
-    st.info("No numerical columns available for histograms.")
+    st.info("No numerical columns available for box plots.")
 
 # --- Outlier Treatment ---
 st.subheader("Outlier Treatment")
@@ -105,22 +113,14 @@ for col in ['Amount_paid', 'Vehicle_Speed']:
         df[col] = np.where(df[col] < lower_bound, lower_bound, df[col])
         df[col] = np.where(df[col] > upper_bound, upper_bound, df[col])
 
-# --- Histograms after Outlier Treatment ---
-st.subheader("Histograms after Outlier Treatment")
+# --- Box plots after Outlier Treatment ---
+st.subheader("Box Plots after Outlier Treatment")
 if numerical_cols:
     for col in numerical_cols:
-        st.write(f"Histogram of {col} (Updated)")
-        counts, bins = np.histogram(df[col], bins=30)
-        hist_df = pd.DataFrame({'Bin': bins[:-1], 'Count': counts})
-        st.bar_chart(hist_df.set_index('Bin')['Count'])
+        st.write(f"Box Plot of {col} (Updated)")
+        st.pyplot(df.boxplot(column=col, grid=False, figsize=(8, 6)))
 else:
-    st.info("No numerical columns available for updated histograms.")
-
-# --- Next Page button at bottom ---
-if st.button("Go to Next Page ➡️"):
-    st.session_state["page"] = "next"
-    st.session_state['df'] = df
-    st.experimental_rerun()
+    st.info("No numerical columns available for updated box plots.")
 
 
 
