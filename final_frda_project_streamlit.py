@@ -71,18 +71,6 @@ if st.session_state["page"] == "home":
     else:
         st.info("Please upload a CSV or Excel file from the sidebar to get started.")
 
-numerical_cols = df.select_dtypes(include='number').columns.tolist()
-if 'isFraud' in numerical_cols:
-    numerical_cols.remove('isFraud')
-
-st.title("📊 Numerical Data Exploration & Outlier Treatment")
-
-# Ensure 'df' exists
-if 'df' not in st.session_state:
-    st.warning("Dataset not found. Please upload your CSV/Excel file first.")
-    st.stop()
-else:
-    df = st.session_state['df']
 
 st.title("📊 Numerical Data Exploration & Outlier Treatment")
 
@@ -91,13 +79,6 @@ st.title("📊 Numerical Data Exploration & Outlier Treatment")
 numerical_cols = df.select_dtypes(include='number').columns.tolist()
 if 'isFraud' in numerical_cols:
     numerical_cols.remove('isFraud')
-
-# --- Next Page button ---
-st.subheader("Proceed to Next Stage")
-if st.button("Go to Next Page ➡️"):
-    st.session_state["page"] = "next"
-    st.session_state['df'] = df  # save dataframe for next page
-    st.experimental_rerun()
 
 # --- Box plots using Streamlit ---
 st.subheader("Box Plots for Numerical Columns (Original)")
