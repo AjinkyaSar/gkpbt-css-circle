@@ -75,10 +75,6 @@ numerical_cols = df.select_dtypes(include='number').columns.tolist()
 if 'isFraud' in numerical_cols:
     numerical_cols.remove('isFraud')
 
-import streamlit as st
-import pandas as pd
-import numpy as np
-
 st.title("📊 Numerical Data Exploration & Outlier Treatment")
 
 # Ensure 'df' exists
