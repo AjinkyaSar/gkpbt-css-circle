@@ -72,29 +72,34 @@ if st.session_state["page"] == "home":
         st.info("Please upload a CSV or Excel file from the sidebar to get started.")
 
 
-import streamlit as st
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-
 st.title("📊 Numerical Data Exploration & Outlier Treatment")
+
 
 numerical_cols = df.select_dtypes(include='number').columns.tolist()
 if 'isFraud' in numerical_cols:
     numerical_cols.remove('isFraud')
 
-# --- Box plots using Streamlit ---
-st.subheader("Box Plots for Numerical Columns (Original)")
+# --- Numerical Statistics (Original) ---
+st.subheader("Numerical Column Statistics (Original)")
 if numerical_cols:
     for col in numerical_cols:
-        st.write(f"Box Plot of {col}")
-        # Create a new figure and axes for the box plot
-        fig, ax = plt.subplots(figsize=(8, 6))
-        df.boxplot(column=col, grid=False, ax=ax)
-        st.pyplot(fig)
-        plt.close(fig) # Close the figure to prevent memory leaks
+        st.write(f"Statistics for {col}")
+        
+        Q1 = df[col].quantile(0.25)
+        Q3 = df[col].quantile(0.75)
+        IQR = Q3 - Q1
+        median = df[col].median()
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+        
+        stats_df = pd.DataFrame({
+            "Metric": ["Q1 (25th Percentile)", "Median", "Q3 (75th Percentile)", "IQR", "Lower Bound", "Upper Bound"],
+            "Value": [Q1, median, Q3, IQR, lower_bound, upper_bound]
+        })
+        
+        st.dataframe(stats_df)
 else:
-    st.info("No numerical columns available for box plots.")
+    st.info("No numerical columns available for statistics.")
 
 # --- Outlier Treatment ---
 st.subheader("Outlier Treatment")
@@ -108,26 +113,28 @@ for col in ['Amount_paid', 'Vehicle_Speed']:
         df[col] = np.where(df[col] < lower_bound, lower_bound, df[col])
         df[col] = np.where(df[col] > upper_bound, upper_bound, df[col])
 
-# --- Box plots after Outlier Treatment ---
-st.subheader("Box Plots after Outlier Treatment")
+# --- Numerical Statistics after Outlier Treatment ---
+st.subheader("Numerical Column Statistics after Outlier Treatment")
 if numerical_cols:
     for col in numerical_cols:
-        st.write(f"Box Plot of {col} (Updated)")
-        # Create a new figure and axes for the box plot
-        fig, ax = plt.subplots(figsize=(8, 6))
-        df.boxplot(column=col, grid=False, ax=ax)
-        st.pyplot(fig)
-        plt.close(fig) # Close the figure to prevent memory leaks
+        st.write(f"Statistics for {col} (Updated)")
+        
+        Q1 = df[col].quantile(0.25)
+        Q3 = df[col].quantile(0.75)
+        IQR = Q3 - Q1
+        median = df[col].median()
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+        
+        stats_df = pd.DataFrame({
+            "Metric": ["Q1 (25th Percentile)", "Median", "Q3 (75th Percentile)", "IQR", "Lower Bound", "Upper Bound"],
+            "Value": [Q1, median, Q3, IQR, lower_bound, upper_bound]
+        })
+        
+        st.dataframe(stats_df)
 else:
-    st.info("No numerical columns available for updated box plots.")
+    st.info("No numerical columns available for updated statistics.")
 
-
-
-# --- Next Page: Label Encoding & Timestamp Features ---
-if st.session_state["page"] == "next":
-    st.title("🛠 Data Preprocessing & Feature Engineering")
-if 'df' in st.session_state:
-  df = st.session_state['df']
   # --- Label Encoding ---
   st.subheader("Label Encoding Categorical Columns")
   from sklearn.preprocessing import LabelEncoder
