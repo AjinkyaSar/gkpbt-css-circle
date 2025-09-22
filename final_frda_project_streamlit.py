@@ -74,32 +74,21 @@ if st.session_state["page"] == "home":
 
 st.title("📊 Numerical Data Exploration & Outlier Treatment")
 
-
 numerical_cols = df.select_dtypes(include='number').columns.tolist()
 if 'isFraud' in numerical_cols:
     numerical_cols.remove('isFraud')
 
-# --- Numerical Statistics (Original) ---
-st.subheader("Numerical Column Statistics (Original)")
+# --- Histograms using Streamlit (Original) ---
+st.subheader("Histograms for Numerical Columns (Original)")
 if numerical_cols:
     for col in numerical_cols:
-        st.write(f"Statistics for {col}")
-        
-        Q1 = df[col].quantile(0.25)
-        Q3 = df[col].quantile(0.75)
-        IQR = Q3 - Q1
-        median = df[col].median()
-        lower_bound = Q1 - 1.5 * IQR
-        upper_bound = Q3 + 1.5 * IQR
-        
-        stats_df = pd.DataFrame({
-            "Metric": ["Q1 (25th Percentile)", "Median", "Q3 (75th Percentile)", "IQR", "Lower Bound", "Upper Bound"],
-            "Value": [Q1, median, Q3, IQR, lower_bound, upper_bound]
-        })
-        
-        st.dataframe(stats_df)
+        st.write(f"Histogram of {col}")
+        # Use Streamlit's native bar chart to display a histogram
+        counts, bins = np.histogram(df[col].dropna(), bins=30)
+        hist_df = pd.DataFrame({'Bin': bins[:-1], 'Count': counts})
+        st.bar_chart(hist_df.set_index('Bin')['Count'])
 else:
-    st.info("No numerical columns available for statistics.")
+    st.info("No numerical columns available for histograms.")
 
 # --- Outlier Treatment ---
 st.subheader("Outlier Treatment")
@@ -113,24 +102,14 @@ for col in ['Amount_paid', 'Vehicle_Speed']:
         df[col] = np.where(df[col] < lower_bound, lower_bound, df[col])
         df[col] = np.where(df[col] > upper_bound, upper_bound, df[col])
 
-# --- Numerical Statistics after Outlier Treatment ---
-st.subheader("Numerical Column Statistics after Outlier Treatment")
+# --- Histograms after Outlier Treatment ---
+st.subheader("Histograms after Outlier Treatment")
 if numerical_cols:
     for col in numerical_cols:
-        st.write(f"Statistics for {col} (Updated)")
-        
-        Q1 = df[col].quantile(0.25)
-        Q3 = df[col].quantile(0.75)
-        IQR = Q3 - Q1
-        median = df[col].median()
-        lower_bound = Q1 - 1.5 * IQR
-        upper_bound = Q3 + 1.5 * IQR
-        
-        stats_df = pd.DataFrame({
-            "Metric": ["Q1 (25th Percentile)", "Median", "Q3 (75th Percentile)", "IQR", "Lower Bound", "Upper Bound"],
-            "Value": [Q1, median, Q3, IQR, lower_bound, upper_bound]
-        })
-        
-        st.dataframe(stats_df)
+        st.write(f"Histogram of {col} (Updated)")
+        # Use Streamlit's native bar chart to display a histogram
+        counts, bins = np.histogram(df[col].dropna(), bins=30)
+        hist_df = pd.DataFrame({'Bin': bins[:-1], 'Count': counts})
+        st.bar_chart(hist_df.set_index('Bin')['Count'])
 else:
-    st.info("No numerical columns available for updated statistics.")
+    st.info("No numerical columns available for updated histograms.")
