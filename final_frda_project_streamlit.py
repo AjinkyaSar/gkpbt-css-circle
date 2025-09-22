@@ -79,76 +79,64 @@ elif st.session_state["page"] == "next":
         st.session_state["page"] = "home"
         st.experimental_rerun()
 
-# Boxplots
+import streamlit as st
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+st.title("📊 Boxplots & Outlier Treatment")
+
+# --- Next Page button ---
+st.subheader("Proceed to Next Stage")
+if st.button("Go to Next Page ➡️"):
+    st.session_state["page"] = "next"
+    st.session_state['df'] = df  # save dataframe for next page
+    st.experimental_rerun()
+
+# --- Boxplots for Numerical Columns ---
 st.subheader("Boxplots for Numerical Columns")
 numerical_cols = df.select_dtypes(include=np.number).columns.tolist()
 if "isFraud" in numerical_cols:
     numerical_cols.remove("isFraud")
 
-if numerical_cols:
-    fig, axes = plt.subplots(
-        nrows=(len(numerical_cols) + 2) // 3,
-        ncols=3,
-        figsize=(15, 10)
-    )
-    axes = axes.flatten()
-
-    for i, col in enumerate(numerical_cols):
-        sns.boxplot(x=df[col], ax=axes[i])
-        axes[i].set_title(col)
-
-    # Hide unused subplots
-    for j in range(i + 1, len(axes)):
-        fig.delaxes(axes[j])
-
-    plt.tight_layout()
-    st.pyplot(fig)
-else:
-    st.info("No numerical columns available for boxplots.")
-
-# Next Page button
-st.subheader("Proceed to Next Stage")
-if st.button("Go to Next Page ➡️"):
-    st.session_state["page"] = "next"
-    st.experimental_rerun()
-
-st.subheader("Outlier Treatment and Updated Boxplots")
-
-for col in ['Amount_paid', 'Vehicle_Speed']:
-    if col in df.columns:
-        Q1 = df[col].quantile(0.25)
-        Q3 = df[col].quantile(0.75)
-        IQR = Q3 - Q1
-
-        lower_bound = Q1 - 1.5 * IQR
-        upper_bound = Q3 + 1.5 * IQR
-
-        df[col] = np.where(df[col] < lower_bound, lower_bound, df[col])
-        df[col] = np.where(df[col] > upper_bound, upper_bound, df[col])
-
-    # Updated boxplots for numerical columns
-    if numerical_cols:
-        fig, axes = plt.subplots(
-            nrows=(len(numerical_cols) + 2) // 3,
-            ncols=3,
-            figsize=(15, 10)
-        )
+def plot_boxplots(df, columns, title="Boxplots"):
+    if columns:
+        n_cols = 3
+        n_rows = (len(columns) + n_cols - 1) // n_cols
+        fig, axes = plt.subplots(nrows=n_rows, ncols=n_cols, figsize=(15, 5*n_rows))
         axes = axes.flatten()
 
-        for i, col in enumerate(numerical_cols):
+        for i, col in enumerate(columns):
             sns.boxplot(x=df[col], ax=axes[i])
-            axes[i].set_title(f'Box Plot of {col}')
+            axes[i].set_title(col)
 
-        # Hide unused subplots
-        for j in range(i + 1, len(axes)):
+        # Remove unused subplots
+        for j in range(i+1, len(axes)):
             fig.delaxes(axes[j])
 
         plt.tight_layout()
         st.pyplot(fig)
     else:
-        st.info("No numerical columns available for updated boxplots.")
+        st.info("No numerical columns available for boxplots.")
 
-st.subheader("Proceed to Data Preprocessing")
+plot_boxplots(df, numerical_cols, "Original Boxplots")
+
+# --- Outlier Treatment ---
+st.subheader("Outlier Treatment")
+for col in ['Amount_paid', 'Vehicle_Speed']:
+    if col in df.columns:
+        Q1 = df[col].quantile(0.25)
+        Q3 = df[col].quantile(0.75)
+        IQR = Q3 - Q1
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+        df[col] = np.where(df[col] < lower_bound, lower_bound, df[col])
+        df[col] = np.where(df[col] > upper_bound, upper_bound, df[col])
+
+st.subheader("Boxplots after Outlier Treatment")
+plot_boxplots(df, numerical_cols, "Updated Boxplots")
+
 
 if st.button("Go to Next Page ➡️"):
   st.session_state["page"] = "next"  # Set the next page
